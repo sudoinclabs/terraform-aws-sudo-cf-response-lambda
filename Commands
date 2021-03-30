@@ -1,0 +1,5 @@
+terraform init
+terraform plan
+terraform apply -var-file=variables.tfvars -auto-approve
+terraform destroy
+terraform refresh
