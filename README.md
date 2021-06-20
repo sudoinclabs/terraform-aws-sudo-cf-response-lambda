@@ -6,7 +6,7 @@ This Terraform module sets up the infrastructure for SNS Backed Cloudformation t
 Module Flow: Provision resources by applying this module, you will get an output `cf_backed_sns_arn`
 use this SNS arn in cloudformation template as `ServiceToken` for the custom resource.
 
-The module creates a Lambda function, SNS topic and a subsription to invoke lambda, along with reuired roles and policies.
+The module creates a Lambda function, SNS topic and a subscription to invoke lambda, along with required roles and policies.
 
 Install
 -------
@@ -22,7 +22,7 @@ Usage
 
 ```hcl
 module "cf_custom_lambda_sns" {
-  source = "<insert_repo_link_here>"
+  source = "github.com/sudoinclabs/terraform-aws-sudo-cf-response-lambda"
 }
 ```
 
