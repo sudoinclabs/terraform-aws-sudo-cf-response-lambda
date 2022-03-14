@@ -14,19 +14,21 @@ Usage
 
 ```hcl
 module "cf_custom_lambda_sns" {
-  source = "github.com/sudoinclabs/terraform-aws-sudo-cf-response-lambda"
+  source  = "sudoinclabs/sudo-cf-response-lambda/aws"
+  version = "1.0.2"
 }
 ```
 
-With customer lambda function (see below for further instructions.)
+With custom lambda function (see below for further instructions.)
 
 ```hcl
 module "cf_custom_lambda_sns" {
-  source = "github.com/sudoinclabs/terraform-aws-sudo-cf-response-lambda"
-  code   = "code"
+  source  = "sudoinclabs/sudo-cf-response-lambda/aws"
+  version = "1.0.2"
+
+  code = "code"
 }
 ```
-
 
 Output
 -------
