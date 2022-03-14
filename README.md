@@ -85,7 +85,9 @@ $ tree
 Author
 ======
 
-saif.ali@sudoconsultants.com
+Saif Ali - saif.ali@sudoconsultants.com
+
+Hameedullah Khan - hameed@sudoconsultants.com
 
 License
 =======
