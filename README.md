@@ -8,14 +8,13 @@ use this SNS arn in cloudformation template as `ServiceToken` for the custom res
 
 The module creates a Lambda function, SNS topic and a subscription to invoke lambda, along with required roles and policies.
 
-
 Usage
 -----
 
 ```hcl
 module "cf_custom_lambda_sns" {
   source  = "sudoinclabs/sudo-cf-response-lambda/aws"
-  version = "1.0.2"
+  version = "1.0.3"
 }
 ```
 
@@ -24,16 +23,19 @@ With custom lambda function (see below for further instructions.)
 ```hcl
 module "cf_custom_lambda_sns" {
   source  = "sudoinclabs/sudo-cf-response-lambda/aws"
-  version = "1.0.2"
+  version = "1.0.3"
 
-  code = "code"
+  lambda_code_path = "code"
+  lambda_env_vars = {}
 }
 ```
 
 Output
 -------
 
- - `cf_backed_sns_arn` - ARN to be used in CloudFormation template as custom resource.
+- `cf_backed_sns_arn` - Arn of the SNS backed CloudFormation custom resource.
+- `cf_backed_lambda_role_name` - Role name of the lambda function.
+- `cf_backed_lambda_arn` - Arn of the lambda function.
 
 Custom Lambda Function
 -------
@@ -46,7 +48,6 @@ pip install crhelper -t ./code
 ```
 
 Create your lambda function file called: lambda_function.py
-
 
 Understanding Cloudformation Template Usage
 -------------------------------------------
@@ -71,6 +72,7 @@ Outputs:
 
 Folder Structure
 -------------------------------------
+
 The folder [code](./code) includes code for lambda.
 
 ```bash
