@@ -3,7 +3,7 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 locals {
-  code_path = var.code != "" ? "${path.root}/${var.code}" : "${path.module}/code"
+  code_path = var.lambda_code_path != "" ? "${path.root}/${var.lambda_code_path}" : "${path.module}/code"
 }
 # create public SNS topic: will trigger the lambda function
 resource "aws_sns_topic" "cf_backed_sns" {
@@ -12,7 +12,7 @@ resource "aws_sns_topic" "cf_backed_sns" {
 
 # policy: only the owner of the topic can subscribe to the topic and anybody can publish
 resource "aws_sns_topic_policy" "cf_backed_sns" {
-  arn = aws_sns_topic.cf_backed_sns.arn
+  arn    = aws_sns_topic.cf_backed_sns.arn
   policy = data.aws_iam_policy_document.cf_backed_sns.json
 }
 
@@ -20,15 +20,15 @@ data "aws_iam_policy_document" "cf_backed_sns" {
   policy_id = "__default_policy_ID"
   statement {
     actions = [
-        "SNS:Publish",
-        "SNS:RemovePermission",
-        "SNS:SetTopicAttributes",
-        "SNS:DeleteTopic",
-        "SNS:ListSubscriptionsByTopic",
-        "SNS:GetTopicAttributes",
-        "SNS:Receive",
-        "SNS:AddPermission",
-        "SNS:Subscribe"
+      "SNS:Publish",
+      "SNS:RemovePermission",
+      "SNS:SetTopicAttributes",
+      "SNS:DeleteTopic",
+      "SNS:ListSubscriptionsByTopic",
+      "SNS:GetTopicAttributes",
+      "SNS:Receive",
+      "SNS:AddPermission",
+      "SNS:Subscribe"
     ]
     condition {
       test     = "StringEquals"
@@ -49,7 +49,7 @@ data "aws_iam_policy_document" "cf_backed_sns" {
   }
   statement {
     actions = [
-        "SNS:Publish",
+      "SNS:Publish",
     ]
     effect = "Allow"
     principals {
@@ -65,7 +65,7 @@ data "aws_iam_policy_document" "cf_backed_sns" {
 
 # create IAM role for lambda custom function
 resource "aws_iam_role" "send_cf_updates" {
-  name = "role_send_cf_updates-${data.aws_region.current.name}"
+  name               = "role_send_cf_updates-${data.aws_region.current.name}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -85,20 +85,23 @@ EOF
 
 # create zip file for code directory
 data "archive_file" "init" {
-  type = "zip"
-  source_dir = local.code_path
+  type        = "zip"
+  source_dir  = local.code_path
   output_path = "${local.code_path}.zip"
 }
 
 # create lambda function
 resource "aws_lambda_function" "send_cf_updates" {
-  function_name = "send_cf_updates"
-  filename      = data.archive_file.init.output_path
-  role          = aws_iam_role.send_cf_updates.arn
-  handler       = "lambda_function.lambda_handler"
-  runtime = "python3.8"
+  function_name    = "send_cf_updates"
+  filename         = data.archive_file.init.output_path
+  role             = aws_iam_role.send_cf_updates.arn
+  handler          = "lambda_function.lambda_handler"
+  runtime          = "python3.8"
   source_code_hash = filebase64sha256(data.archive_file.init.output_path)
-  timeout = var.timeout
+  timeout          = var.timeout
+  environment {
+    variables = var.lambda_env_vars
+  }
 }
 
 # gives cf_backed_sns permission to access the send_cf_updates Lambda function.
@@ -112,10 +115,10 @@ resource "aws_lambda_permission" "with_sns" {
 
 # create subscription for lambda to trigger on cf_backed_sns
 resource "aws_sns_topic_subscription" "cf_backed_sns_to_send_cf_updates" {
-  endpoint = aws_lambda_function.send_cf_updates.arn
-  protocol = "lambda"
+  endpoint             = aws_lambda_function.send_cf_updates.arn
+  protocol             = "lambda"
   raw_message_delivery = false
-  topic_arn = aws_sns_topic.cf_backed_sns.arn
+  topic_arn            = aws_sns_topic.cf_backed_sns.arn
 }
 
 resource "aws_iam_role_policy_attachment" "iam_corp_role_ssmread_policy_attachment" {
