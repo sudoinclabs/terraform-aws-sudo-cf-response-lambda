@@ -10,8 +10,8 @@ variable "lambda_env_vars" {
   type        = map(string)
 }
 
-variable "timeout" {
+variable "lambda_timeout" {
   type = number
-  description = "(optional) Timeout value."
+  description = "(optional) Timeout value in seconds."
   default = 3
 }

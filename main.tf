@@ -98,7 +98,7 @@ resource "aws_lambda_function" "send_cf_updates" {
   handler          = "lambda_function.lambda_handler"
   runtime          = "python3.8"
   source_code_hash = filebase64sha256(data.archive_file.init.output_path)
-  timeout          = var.timeout
+  timeout          = var.lambda_timeout
   environment {
     variables = var.lambda_env_vars
   }
